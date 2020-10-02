@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+	<sub-flow name="get-profile-orchestratorSub_Flow">
+		<dw:transform-message doc:name="Transform Message">
+			<dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+%var textToTransform = flowVars.fileToRead
+%var splitText = textToTransform splitBy "\r\n"
+%function splitByComma(value) (value splitBy ",")
+%function splitByColon(value) (value splitBy ":")
+---
+ splitText map {
+	profile: splitByComma(splitText[$$])[0],
+	data: {
+		username: splitByColon(splitByComma(splitText[$$])[1])[1],
+		location: splitByColon(splitByComma(splitText[$$])[2])[1],
+		online: splitByColon(splitByComma(splitText[$$])[3])[1],
+		followers: splitByColon(splitByComma(splitText[$$])[4])[1]
+	} 
+}]]></dw:set-payload>
+		</dw:transform-message>
+	</sub-flow>
+</mule>

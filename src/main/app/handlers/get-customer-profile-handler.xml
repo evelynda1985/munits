@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+	<file:connector name="File" autoDelete="false" streaming="true" validateConnections="true" doc:name="File"/>
+	<sub-flow name="get-customer-profile-handlerSub_Flow">
+		<dw:transform-message doc:name="ReadFile">
+			<dw:set-variable variableName="fileToRead"><![CDATA[%dw 1.0
+%output application/java
+%var fileToRead = readUrl("classpath://in/data.txt","application/java")
+---
+fileToRead]]></dw:set-variable>
+		</dw:transform-message>
+
+		<flow-ref name="get-profile-orchestratorSub_Flow" doc:name="TransformDataFromTxt"/>
+	</sub-flow>
+</mule>

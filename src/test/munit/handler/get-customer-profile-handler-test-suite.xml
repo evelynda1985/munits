@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:mock="http://www.mulesoft.org/schema/mule/mock" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/mock/current/mule-mock.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <munit:config name="munit" doc:name="MUnit configuration"/>
+    <spring:beans>
+        <spring:import resource="classpath:handlers/get-customer-profile-handler.xml"/>
+        <spring:bean id="get-profile-orchestratorSub_Flow" name="Bean" class="us.everis.mule.utils.MockMessageProcessor"/>
+    </spring:beans>
+    <munit:test name="get-customer-profile-handler-test-suite-get-customer-profile-handlerSub_FlowTest" description="Test">
+		<mock:when messageProcessor=".*:.*" doc:name="Mock">
+			<mock:with-attributes>
+				<mock:with-attribute name="name" whereValue="'get-profile-orchestratorSub_Flow'"/>
+			</mock:with-attributes>
+			<mock:then-return payload="#[]" mimeType="application/java"/>
+		</mock:when>
+		<mock:spy doc:name="Spy" messageProcessor=".*:.*">
+			<mock:assertions-after-call>
+				<munit:assert-on-equals message="Failed" expectedValue="[{&quot;profile&quot;: &quot;sammy&quot;,&quot;data&quot;: {&quot;username&quot;: &quot;SammyShark&quot;,&quot;location&quot;: &quot; Indian Ocean&quot;,&quot;online&quot;: &quot;true&quot;,&quot;followers&quot;: &quot;987&quot;}}" actualValue="#[payload]" doc:name="Assert Equals"/>
+			</mock:assertions-after-call>
+		</mock:spy>
+		<dw:transform-message doc:name="Transform Message">
+			<dw:set-variable variableName="data"><![CDATA[%dw 1.0
+%output application/java
+---
+"sammy,username:SammyShark,location: Indian Ocean,online:true,followers:987"]]></dw:set-variable>
+		</dw:transform-message>
+		<flow-ref name="get-customer-profile-handlerSub_Flow" doc:name="Flow-ref to get-customer-profile-handlerSub_Flow"/>
+    </munit:test>
+</mule>
